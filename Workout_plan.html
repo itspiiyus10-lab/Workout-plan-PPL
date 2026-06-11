@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Push Pull Legs — Hourglass Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rose: #F2A8B0;
+    --rose-deep: #D96B7A;
+    --rose-pale: #FDF0F2;
+    --blush: #F7D6DA;
+    --lilac: #C9B8E8;
+    --lilac-pale: #F3EFF9;
+    --lilac-deep: #8B6BBE;
+    --sage: #A8C4A2;
+    --sage-pale: #EFF5EE;
+    --sage-deep: #4E7B47;
+    --gold: #E8C97A;
+    --gold-pale: #FDF6E3;
+    --cream: #FEFAF7;
+    --ink: #2A1F2D;
+    --muted: #7A6B7D;
+    --border: rgba(200, 170, 180, 0.25);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #FDF0F2 0%, #F3EFF9 50%, #EFF5EE 100%);
+    padding: 60px 40px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(242,168,176,0.3) 0%, transparent 70%);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,184,232,0.25) 0%, transparent 70%);
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--rose-deep);
+    margin-bottom: 14px;
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--rose-deep);
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto 28px;
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  .schedule-strip {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .sday {
+    padding: 7px 14px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .sday-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .sday-push { background: #FDF0F2; color: var(--rose-deep); border-color: var(--blush); }
+  .sday-push .sday-dot { background: var(--rose-deep); }
+  .sday-pull { background: var(--lilac-pale); color: var(--lilac-deep); border-color: #DDD3F0; }
+  .sday-pull .sday-dot { background: var(--lilac-deep); }
+  .sday-legs { background: var(--sage-pale); color: var(--sage-deep); border-color: #C5DCC2; }
+  .sday-legs .sday-dot { background: var(--sage-deep); }
+  .sday-rest { background: #F5F2F0; color: #9A8F93; border-color: #E5E0DE; }
+  .sday-rest .sday-dot { background: #C4BBC0; }
+
+  /* ── MAIN ── */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 36px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: #fff;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 14px 10px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all 0.2s;
+    border-right: 1px solid var(--border);
+    line-height: 1.3;
+    text-align: center;
+  }
+  .tab-btn:last-child { border-right: none; }
+  .tab-btn .tab-icon { font-size: 18px; display: block; margin-bottom: 3px; }
+
+  .tab-btn.active-push { background: var(--rose-pale); color: var(--rose-deep); }
+  .tab-btn.active-pull { background: var(--lilac-pale); color: var(--lilac-deep); }
+  .tab-btn.active-legs { background: var(--sage-pale); color: var(--sage-deep); }
+
+  /* ── PANEL ── */
+  .day-panel { display: none; animation: fadeIn 0.25s ease; }
+  .day-panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .panel-header {
+    display: flex; align-items: flex-start; gap: 16px;
+    margin-bottom: 20px;
+    padding: 22px 24px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+  }
+  .panel-header-push { background: linear-gradient(120deg, #FDF0F2, #FFF5F6); }
+  .panel-header-pull { background: linear-gradient(120deg, #F3EFF9, #F7F4FC); }
+  .panel-header-legs { background: linear-gradient(120deg, #EFF5EE, #F4F9F3); }
+
+  .panel-icon { font-size: 36px; flex-shrink: 0; }
+
+  .panel-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .push-color { color: var(--rose-deep); }
+  .pull-color { color: var(--lilac-deep); }
+  .legs-color { color: var(--sage-deep); }
+
+  .panel-subtitle { font-size: 13px; color: var(--muted); font-weight: 300; line-height: 1.5; }
+
+  .focus-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .chip {
+    font-size: 11px; padding: 3px 10px;
+    border-radius: 99px;
+    font-weight: 500;
+  }
+  .chip-push { background: var(--blush); color: var(--rose-deep); }
+  .chip-pull { background: #DDD3F0; color: var(--lilac-deep); }
+  .chip-legs { background: #C5DCC2; color: var(--sage-deep); }
+
+  /* ── EXERCISE CARDS ── */
+  .exercises { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
+  .ex-card {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: 14px;
+    align-items: start;
+    padding: 16px 18px;
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .ex-card:hover {
+    box-shadow: 0 4px 20px rgba(180, 120, 140, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .ex-num {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .num-push { background: var(--blush); color: var(--rose-deep); }
+  .num-pull { background: #DDD3F0; color: var(--lilac-deep); }
+  .num-legs { background: #C5DCC2; color: var(--sage-deep); }
+
+  .ex-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 3px;
+    color: var(--ink);
+  }
+  .ex-note {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+  .muscle-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .mtag {
+    font-size: 10px; padding: 2px 8px;
+    border-radius: 99px; font-weight: 500;
+  }
+  .mt-shoulders { background: #FDE8E0; color: #C0523A; }
+  .mt-chest { background: #FBEAF0; color: #B04570; }
+  .mt-triceps { background: #FDE8E0; color: #C0523A; }
+  .mt-back { background: #EAE5F5; color: #6B52A0; }
+  .mt-biceps { background: #EAE5F5; color: #6B52A0; }
+  .mt-rear { background: #E0F0E8; color: #3E7A50; }
+  .mt-glutes { background: #E5F0E3; color: var(--sage-deep); }
+  .mt-hamstrings { background: #E5F0E3; color: var(--sage-deep); }
+  .mt-quads { background: #EDE8F7; color: #6040A0; }
+  .mt-calves { background: #EDE8F7; color: #6040A0; }
+  .mt-hip { background: #FDF4E0; color: #9A7020; }
+  .mt-core { background: #FDF4E0; color: #9A7020; }
+
+  .ex-sets {
+    text-align: right;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .sets-main {
+    font-size: 14px; font-weight: 600;
+    color: var(--ink);
+  }
+  .sets-intensity {
+    font-size: 11px;
+    margin-top: 3px;
+    display: flex; align-items: center; gap: 3px;
+    justify-content: flex-end;
+    font-weight: 400;
+  }
+  .int-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .int-high { background: #E05D5D; }
+  .int-med { background: #E8B96A; }
+  .int-text-high { color: #C04040; }
+  .int-text-med { color: #B07A20; }
+
+  /* ── TIP BOX ── */
+  .tip-box {
+    padding: 16px 20px;
+    border-radius: 14px;
+    border-left: 3px solid;
+    font-size: 13px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .tip-push { background: var(--rose-pale); border-color: var(--rose-deep); color: #7A3040; }
+  .tip-pull { background: var(--lilac-pale); border-color: var(--lilac-deep); color: #5A4080; }
+  .tip-legs { background: var(--sage-pale); border-color: var(--sage-deep); color: #305028; }
+  .tip-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 5px; opacity: 0.7;
+  }
+
+  /* ── GUIDE SECTION ── */
+  .guide {
+    margin-top: 52px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+  .guide-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .guide-sub {
+    text-align: center; font-size: 14px; color: var(--muted);
+    margin-bottom: 32px; font-weight: 300;
+  }
+  .guide-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .guide-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 18px;
+  }
+  .guide-card-icon { font-size: 26px; margin-bottom: 10px; }
+  .guide-card-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--ink); }
+  .guide-card-body { font-size: 13px; color: var(--muted); line-height: 1.6; font-weight: 300; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 28px 20px;
+    font-size: 12px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    letter-spacing: 0.02em;
+    font-weight: 300;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .hero { padding: 40px 20px 36px; }
+    .container { padding: 32px 16px 60px; }
+    .ex-card { grid-template-columns: 32px 1fr; }
+    .ex-sets { grid-column: 2; }
+    .tab-btn { font-size: 11px; padding: 12px 6px; }
+    .tabs { border-radius: 12px; }
+    .panel-header { flex-direction: column; gap: 10px; padding: 18px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .day-panel { animation: none; }
+    .ex-card:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <p class="hero-eyebrow">6-day split · 1 hour sessions</p>
+  <h1>Push Pull Legs<br>for an <em>hourglass</em> figure</h1>
+  <p class="hero-sub">Built around shoulders, lats & glutes — the three pillars of the hourglass shape — with a core-cinching finish every session.</p>
+  <div class="schedule-strip">
+    <span class="sday sday-push"><span class="sday-dot"></span>Mon — Push</span>
+    <span class="sday sday-pull"><span class="sday-dot"></span>Tue — Pull</span>
+    <span class="sday sday-legs"><span class="sday-dot"></span>Wed — Legs</span>
+    <span class="sday sday-rest"><span class="sday-dot"></span>Thu — Rest</span>
+    <span class="sday sday-push"><span class="sday-dot"></span>Fri — Push</span>
+    <span class="sday sday-pull"><span class="sday-dot"></span>Sat — Pull</span>
+    <span class="sday sday-legs"><span class="sday-dot"></span>Sun — Legs</span>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="container">
+
+  <!-- TABS -->
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active-push" id="tab-push" role="tab" aria-selected="true" onclick="showDay('push')">
+      <span class="tab-icon">🌸</span>Push<br><span style="font-weight:300;font-size:11px;color:inherit;opacity:0.7">Chest · Shoulders · Triceps</span>
+    </button>
+    <button class="tab-btn" id="tab-pull" role="tab" aria-selected="false" onclick="showDay('pull')">
+      <span class="tab-icon">🌀</span>Pull<br><span style="font-weight:300;font-size:11px;color:inherit;opacity:0.7">Back · Biceps · Rear Delt</span>
+    </button>
+    <button class="tab-btn" id="tab-legs" role="tab" aria-selected="false" onclick="showDay('legs')">
+      <span class="tab-icon">🌿</span>Legs + Core<br><span style="font-weight:300;font-size:11px;color:inherit;opacity:0.7">Glutes · Hams · Abductors</span>
+    </button>
+  </div>
+
+  <!-- ── PUSH ── -->
+  <div id="panel-push" class="day-panel active" role="tabpanel">
+    <div class="panel-header panel-header-push">
+      <div class="panel-icon">🌸</div>
+      <div>
+        <div class="panel-title push-color">Push Day</div>
+        <div class="panel-subtitle">Chest · Shoulders · Triceps · Obliques<br>Goal: wide shoulder shelf + tight waist</div>
+        <div class="focus-chips">
+          <span class="chip chip-push">Wider shoulders = visual hourglass</span>
+          <span class="chip chip-push">Upper chest fullness</span>
+          <span class="chip chip-push">Oblique cinching</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercises">
+
+      <div class="ex-card">
+        <div class="ex-num num-push">1</div>
+        <div>
+          <div class="ex-name">Dumbbell lateral raise</div>
+          <div class="ex-note">Slow eccentric (3 sec down), shoulder-width stance, slight forward lean</div>
+          <div class="muscle-tags"><span class="mtag mt-shoulders">Lateral deltoid</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">4 × 12–15</div>
+          <div class="sets-intensity"><span class="int-dot int-high"></span><span class="int-text-high">High</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-push">2</div>
+        <div>
+          <div class="ex-name">Incline dumbbell press</div>
+          <div class="ex-note">30–45° bench, full stretch at the bottom, squeeze at top</div>
+          <div class="muscle-tags"><span class="mtag mt-chest">Upper chest</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">4 × 8–10</div>
+          <div class="sets-intensity"><span class="int-dot int-high"></span><span class="int-text-high">High</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-push">3</div>
+        <div>
+          <div class="ex-name">Seated overhead press</div>
+          <div class="ex-note">Dumbbell or barbell, core braced, controlled descent</div>
+          <div class="muscle-tags"><span class="mtag mt-shoulders">Deltoid</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 8–10</div>
+          <div class="sets-intensity"><span class="int-dot int-high"></span><span class="int-text-high">High</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-push">4</div>
+        <div>
+          <div class="ex-name">Cable chest fly (low-to-high)</div>
+          <div class="ex-note">Cable from low pulley, arms arc upward — emphasises upper chest, squeeze hard at top</div>
+          <div class="muscle-tags"><span class="mtag mt-chest">Chest</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 12–15</div>
+          <div class="sets-intensity"><span class="int-dot int-med"></span><span class="int-text-med">Med</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-push">5</div>
+        <div>
+          <div class="ex-name">Tricep rope pushdown</div>
+          <div class="ex-note">Elbows glued to sides, full extension at the bottom</div>
+          <div class="muscle-tags"><span class="mtag mt-triceps">Triceps</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 12–15</div>
+          <div class="sets-intensity"><span class="int-dot int-med"></span><span class="int-text-med">Med</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-push">6</div>
+        <div>
+          <div class="ex-name">Overhead tricep extension</div>
+          <div class="ex-note">Long head stretch, controlled lowering, single dumbbell or cable</div>
+          <div class="muscle-tags"><span class="mtag mt-triceps">Triceps long head</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 10–12</div>
+          <div class="sets-intensity"><span class="int-dot int-med"></span><span class="int-text-med">Med</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-push">7</div>
+        <div>
+          <div class="ex-name">Cable oblique crunch</div>
+          <div class="ex-note">Side-bend pattern only, don't rotate — targets the waist cinch</div>
+          <div class="muscle-tags"><span class="mtag mt-core">Obliques</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 15 each</div>
+          <div class="sets-intensity"><span class="int-dot int-high"></span><span class="int-text-high">High</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-push">8</div>
+        <div>
+          <div class="ex-name">Plank hold</div>
+          <div class="ex-note">Navel drawn in, flat back, breathe — don't hold your breath</div>
+          <div class="muscle-tags"><span class="mtag mt-core">Deep core</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 40–60s</div>
+          <div class="sets-intensity"><span class="int-dot int-med"></span><span class="int-text-med">Med</span></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="tip-box tip-push">
+      <div class="tip-label">✦ Coach's note</div>
+      Treat lateral raises like a priority compound lift, not a throwaway finisher. They're your number-one tool for shoulder width — that width is what makes the waist look dramatically narrower. Load them progressively.
+    </div>
+  </div>
+
+  <!-- ── PULL ── -->
+  <div id="panel-pull" class="day-panel" role="tabpanel">
+    <div class="panel-header panel-header-pull">
+      <div class="panel-icon">🌀</div>
+      <div>
+        <div class="panel-title pull-color">Pull Day</div>
+        <div class="panel-subtitle">Back · Biceps · Rear Delt · Core<br>Goal: lat width for visual V-taper + waist contrast</div>
+        <div class="focus-chips">
+          <span class="chip chip-pull">Lat width for V-taper</span>
+          <span class="chip chip-pull">Rear delt balance</span>
+          <span class="chip chip-pull">Waist anti-rotation</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercises">
+
+      <div class="ex-card">
+        <div class="ex-num num-pull">1</div>
+        <div>
+          <div class="ex-name">Lat pulldown (wide grip)</div>
+          <div class="ex-note">Full stretch overhead, drive elbows down and back — feel the lats, not the biceps</div>
+          <div class="muscle-tags"><span class="mtag mt-back">Lats</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">4 × 8–10</div>
+          <div class="sets-intensity"><span class="int-dot int-high"></span><span class="int-text-high">High</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-pull">2</div>
+        <div>
+          <div class="ex-name">Seated cable row (narrow grip)</div>
+          <div class="ex-note">Chest to pad, elbows flared 45°, retract scapula at the finish</div>
+          <div class="muscle-tags"><span class="mtag mt-back">Mid back</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">4 × 10–12</div>
+          <div class="sets-intensity"><span class="int-dot int-high"></span><span class="int-text-high">High</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-pull">3</div>
+        <div>
+          <div class="ex-name">Face pull (cable rope)</div>
+          <div class="ex-note">Rope to forehead level, external rotation at the end — protects shoulder health</div>
+          <div class="muscle-tags"><span class="mtag mt-rear">Rear delt</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 15–20</div>
+          <div class="sets-intensity"><span class="int-dot int-med"></span><span class="int-text-med">Med</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-pull">4</div>
+        <div>
+          <div class="ex-name">Single-arm dumbbell row</div>
+          <div class="ex-note">Elbow drives past hip, no trunk twist — keep hips square</div>
+          <div class="muscle-tags"><span class="mtag mt-back">Lats</span><span class="mtag mt-back">Rhomboids</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 10–12</div>
+          <div class="sets-intensity"><span class="int-dot int-high"></span><span class="int-text-high">High</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-pull">5</div>
+        <div>
+          <div class="ex-name">Incline dumbbell curl</div>
+          <div class="ex-note">Long head bias, full supination at the top, slow eccentric</div>
+          <div class="muscle-tags"><span class="mtag mt-biceps">Biceps</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 10–12</div>
+          <div class="sets-intensity"><span class="int-dot int-med"></span><span class="int-text-med">Med</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-pull">6</div>
+        <div>
+          <div class="ex-name">Hammer curl</div>
+          <div class="ex-note">Neutral grip, brachialis emphasis, no swinging</div>
+          <div class="muscle-tags"><span class="mtag mt-biceps">Brachialis</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 12–15</div>
+          <div class="sets-intensity"><span class="int-dot int-med"></span><span class="int-text-med">Med</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-pull">7</div>
+        <div>
+          <div class="ex-name">Dead bug</div>
+          <div class="ex-note">Lower back pressed into floor throughout — opposite arm and leg extend slowly</div>
+          <div class="muscle-tags"><span class="mtag mt-core">Deep core</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 10 each</div>
+          <div class="sets-intensity"><span class="int-dot int-med"></span><span class="int-text-med">Med</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-pull">8</div>
+        <div>
+          <div class="ex-name">Hanging knee raise</div>
+          <div class="ex-note">Posterior pelvic tilt, no swinging — or do lying leg raises if no bar available</div>
+          <div class="muscle-tags"><span class="mtag mt-core">Lower abs</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 15</div>
+          <div class="sets-intensity"><span class="int-dot int-high"></span><span class="int-text-high">High</span></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="tip-box tip-pull">
+      <div class="tip-label">✦ Coach's note</div>
+      Lat width seen from behind creates the V-taper that makes the waist look narrower without a single crunch. Face pulls prevent shoulder imbalance — essential if you push hard on push day. Never skip them.
+    </div>
+  </div>
+
+  <!-- ── LEGS ── -->
+  <div id="panel-legs" class="day-panel" role="tabpanel">
+    <div class="panel-header panel-header-legs">
+      <div class="panel-icon">🌿</div>
+      <div>
+        <div class="panel-title legs-color">Legs + Core Day</div>
+        <div class="panel-subtitle">Glutes · Hamstrings · Quads · Hip Abductors · Core<br>Goal: round glute shelf + hip width + flat lower abdomen</div>
+        <div class="focus-chips">
+          <span class="chip chip-legs">Round glutes = hourglass base</span>
+          <span class="chip chip-legs">Hip abductor width</span>
+          <span class="chip chip-legs">Waist vacuum drill</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercises">
+
+      <div class="ex-card">
+        <div class="ex-num num-legs">1</div>
+        <div>
+          <div class="ex-name">Hip thrust (barbell or dumbbell)</div>
+          <div class="ex-note">Chin tucked, full hip extension, hard glute squeeze at the top for 1 sec</div>
+          <div class="muscle-tags"><span class="mtag mt-glutes">Glutes max</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">4 × 10–12</div>
+          <div class="sets-intensity"><span class="int-dot int-high"></span><span class="int-text-high">High</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-legs">2</div>
+        <div>
+          <div class="ex-name">Romanian deadlift</div>
+          <div class="ex-note">Hip hinge, soft knees, feel the hamstring stretch — bar stays close to legs</div>
+          <div class="muscle-tags"><span class="mtag mt-hamstrings">Hamstrings</span><span class="mtag mt-glutes">Glutes</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">4 × 8–10</div>
+          <div class="sets-intensity"><span class="int-dot int-high"></span><span class="int-text-high">High</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-legs">3</div>
+        <div>
+          <div class="ex-name">Sumo squat (goblet)</div>
+          <div class="ex-note">Wide stance, toes out 45°, knees track over toes — dumbbell held at chest</div>
+          <div class="muscle-tags"><span class="mtag mt-glutes">Glute med</span><span class="mtag mt-quads">Inner quads</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 12–15</div>
+          <div class="sets-intensity"><span class="int-dot int-high"></span><span class="int-text-high">High</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-legs">4</div>
+        <div>
+          <div class="ex-name">Cable kickback</div>
+          <div class="ex-note">No hip hike, glute-led extension — pause at full extension</div>
+          <div class="muscle-tags"><span class="mtag mt-glutes">Glutes</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 15 each</div>
+          <div class="sets-intensity"><span class="int-dot int-med"></span><span class="int-text-med">Med</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-legs">5</div>
+        <div>
+          <div class="ex-name">Hip abductor machine (or side-lying raise)</div>
+          <div class="ex-note">Control the close, don't let the machine slam — feel the outer glute</div>
+          <div class="muscle-tags"><span class="mtag mt-hip">Hip abductors</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">4 × 15–20</div>
+          <div class="sets-intensity"><span class="int-dot int-high"></span><span class="int-text-high">High</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-legs">6</div>
+        <div>
+          <div class="ex-name">Walking lunge</div>
+          <div class="ex-note">Front heel drives, torso upright — dumbbells for load</div>
+          <div class="muscle-tags"><span class="mtag mt-quads">Quads</span><span class="mtag mt-glutes">Glutes</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 12 each</div>
+          <div class="sets-intensity"><span class="int-dot int-med"></span><span class="int-text-med">Med</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-legs">7</div>
+        <div>
+          <div class="ex-name">Seated calf raise</div>
+          <div class="ex-note">Full range, slow 3-sec eccentric, pause at the bottom</div>
+          <div class="muscle-tags"><span class="mtag mt-calves">Calves</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 15–20</div>
+          <div class="sets-intensity"><span class="int-dot int-med"></span><span class="int-text-med">Med</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-legs">8</div>
+        <div>
+          <div class="ex-name">Bicycle crunch</div>
+          <div class="ex-note">Slow and deliberate — it's not a speed drill. Feel each oblique contract</div>
+          <div class="muscle-tags"><span class="mtag mt-core">Obliques</span><span class="mtag mt-core">Abs</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 20</div>
+          <div class="sets-intensity"><span class="int-dot int-high"></span><span class="int-text-high">High</span></div>
+        </div>
+      </div>
+
+      <div class="ex-card">
+        <div class="ex-num num-legs">9</div>
+        <div>
+          <div class="ex-name">Stomach vacuum hold ✨</div>
+          <div class="ex-note">Empty your lungs, draw navel toward spine, hold 20–30 sec. The single best drill for a smaller-looking waist.</div>
+          <div class="muscle-tags"><span class="mtag mt-core">Transverse abs</span></div>
+        </div>
+        <div class="ex-sets">
+          <div class="sets-main">3 × 30s</div>
+          <div class="sets-intensity"><span class="int-dot int-med"></span><span class="int-text-med">Med</span></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="tip-box tip-legs">
+      <div class="tip-label">✦ Coach's note</div>
+      The stomach vacuum trains the transverse abdominis — your deep natural corset muscle. Do it fasted each morning too, not just here. Hip abductors add the visual hip flare that completes the hourglass base.
+    </div>
+  </div>
+
+  <!-- GUIDE -->
+  <section class="guide">
+    <div class="guide-title">How to make it work</div>
+    <p class="guide-sub">The plan is only as good as how you run it.</p>
+    <div class="guide-grid">
+      <div class="guide-card">
+        <div class="guide-card-icon">⏱️</div>
+        <div class="guide-card-title">Rest times</div>
+        <div class="guide-card-body">60–90 sec for isolations (cables, curls, laterals). 2–3 min for compounds (hip thrust, RDL, overhead press).</div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-card-icon">📈</div>
+        <div class="guide-card-title">Progressive overload</div>
+        <div class="guide-card-body">Add reps before adding weight. Once you hit the top of the rep range comfortably, add 2–2.5 kg next session.</div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-card-icon">🕐</div>
+        <div class="guide-card-title">Session length</div>
+        <div class="guide-card-body">Each session runs 55–65 minutes at this volume. Warm up 5 min, keep rest disciplined.</div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-card-icon">🌙</div>
+        <div class="guide-card-title">Recovery</div>
+        <div class="guide-card-body">Thursday is full rest. Sleep 7–9 hrs — that's when the shape actually changes. Protein 1.6–2 g per kg bodyweight.</div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-card-icon">🔄</div>
+        <div class="guide-card-title">Alternate schedule option</div>
+        <div class="guide-card-body">If recovery feels hard, switch to 3 on / 1 off / 3 on instead of 6 consecutive days.</div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-card-icon">🌅</div>
+        <div class="guide-card-title">Morning habit</div>
+        <div class="guide-card-body">Do 3 sets of stomach vacuums fasted every morning — takes 3 minutes and adds up fast over weeks.</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Made with 💗 &nbsp;·&nbsp; Push · Pull · Legs for the Hourglass &nbsp;·&nbsp; 6-day split
+</footer>
+
+<script>
+  const tabs = {
+    push: { btn: 'tab-push', panel: 'panel-push', active: 'active-push' },
+    pull: { btn: 'tab-pull', panel: 'panel-pull', active: 'active-pull' },
+    legs: { btn: 'tab-legs', panel: 'panel-legs', active: 'active-legs' }
+  };
+
+  function showDay(day) {
+    Object.entries(tabs).forEach(([key, t]) => {
+      const btn = document.getElementById(t.btn);
+      const panel = document.getElementById(t.panel);
+      if (key === day) {
+        btn.classList.add(t.active);
+        btn.setAttribute('aria-selected', 'true');
+        panel.classList.add('active');
+      } else {
+        btn.classList.remove(t.active);
+        btn.setAttribute('aria-selected', 'false');
+        panel.classList.remove('active');
+      }
+    });
+  }
+</script>
+</body>
+</html>
